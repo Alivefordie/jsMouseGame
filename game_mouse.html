@@ -1,9 +1,19 @@
 <html>
 <head>
 	<title></title>
+	<script type="text/javascript">	
+	function onlyone(id){
+		for(var i=0;i<=1;i++){
+			document.getElementById("c"+i).checked=false;
+		};
+		document.getElementById(id).checked=true;
+	};
+	</script>
 </head>
 <body>
 	<button onclick="startGame()">New</button>
+	<input type="checkbox" name="easy" id="c0" onclick="onlyone(this.id)">Easy
+	<input type="checkbox" name="hard" id="c1" onclick="onlyone(this.id)">Hard
 	<div id="time">Play me</div>
 	<canvas id="paper" width="400" height="400">
 	</canvas>
@@ -15,20 +25,20 @@
 				this.y = Math.floor(Math.random()*canvas.height);
 				this.lifetime = 3000;
 				this.radius = 5;      		
-			}
+			};
 			live(ms){
 				this.lifetime -= ms;
-			}
+			};
 			isAlive(){
 				return this.lifetime > 0; 
-			}	
+			};
 		};
 		class extendship extends Enemy{
 			constructor(){
 				super();
 				this.lifetime = 5000;
 				this.radius=7;
-			}
+			};
 		};
 		class ourship{
 			constructor(){
@@ -37,7 +47,7 @@
 				this.radius=5;
 				this.color='red';
 				this.v=100;
-			}
+			};
 			moveTo(x, y, ms){
 				var st = this.v * ms / 1000;
 				var diffy = y - this.y;
@@ -48,7 +58,7 @@
 				if(!isNaN(zeta)){
 					this.x += Math.cos(zeta) * st * dx;
 					this.y += Math.sin(zeta) * st * dy;	
-				}
+				};
 				if(this.x > canvas.width)
 					this.x = canvas.width;
 				else if (this.x < 0)
@@ -57,15 +67,15 @@
 					this.y = canvas.height;
 				else if(this.y < 0)
 					this.y = 0;	
-			}
-		}
+			};
+		};
 		class ExtraEnemy extends Enemy{
 			constructor(){
 				super();
-				this.lifetime = 2000;
+				this.lifetime = 3000;
 				this.radius=3;
 				this.v=30;
-			}
+			};
 			moveTo(x, y, ms){
 				var st = this.v * ms / 1000;
 				var diffy = y - this.y;
@@ -76,7 +86,7 @@
 				if(!isNaN(zeta)){
 					this.x += Math.cos(zeta) * st * dx;
 					this.y += Math.sin(zeta) * st * dy;	
-				}
+				};
 				if(this.x > canvas.width)
 					this.x = canvas.width;
 				else if (this.x < 0)
@@ -85,7 +95,7 @@
 					this.y = canvas.height;
 				else if(this.y < 0)
 					this.y = 0;	
-			}
+			};
 		};
 		var canvas = document.getElementById("paper");
 		var targetX = canvas.width / 2;
@@ -95,6 +105,7 @@
 		var ExtraEnemies=[];
 		var extship=new extendship();
 		var gameRunning = false;
+		var gamemode=null
 
 		var lastStamp = 0;
 		var time = 0;
@@ -103,25 +114,32 @@
 		ccimg.src="https://ih1.redbubble.net/image.846505062.7003/flat,750x,075,f-pad,750x1000,f8f8f8.u3.jpg";
 		setInterval(function(){
 			var deadEnemyIndices = [];
-			for(var i = 0; i < enemies.length; i++){
-				enemies[i].live(1000);
-				if(!enemies[i].isAlive())
-					deadEnemyIndices.push(i);
-			}
-			for(var i = deadEnemyIndices.length; i > 0; i--){
-				enemies.splice(deadEnemyIndices[i], 1);
-			}
+			var deadExtraEnemyIndices=[];
+			function liveAndkill(type,dtype){
+				for(var i = 0; i < type.length; i++){
+					type[i].live(1000);
+					if(!type[i].isAlive())
+						dtype.push(i);
+				};
+				for(var i = dtype.length; i > 0; i--){
+					type.splice(dtype[i], 1);
+				};
+			};
+			liveAndkill(enemies,deadEnemyIndices);
+			if(gamemode==0){
+				liveAndkill(ExtraEnemies,deadExtraEnemyIndices);
+			};
 			enemies.push(new Enemy());
-			ExtraEnemies.push(new ExtraEnemy())
+			ExtraEnemies.push(new ExtraEnemy());
 			if(extship.isAlive()){
 				extship.live(1000);
 			} else{
 				extship=new extendship();
-			}
+			};
 			if(gameRunning){
 				time += 1;
 				document.getElementById('time').innerHTML = 'time : ' + time +" your score : "+score;
-			}
+			};
 		}, 1000);
 		function draw(){
 			if(gameRunning){			
@@ -149,6 +167,7 @@
 				context.beginPath();
 		        context.arc(ship.x, ship.y, ship.radius, 0, 2 * Math.PI, false);
 		        context.fillStyle = ship.color;
+				context.stroke();
 		        context.fill();
 				for(var i = 0; i < ExtraEnemies.length; i++){
 		        	context.beginPath();
@@ -156,24 +175,26 @@
 			        context.fillStyle = '#FF99FF';
 					context.stroke();
 			        context.fill();
-		        }
+		        };
 		        for(var i = 0; i < enemies.length; i++){
 		        	context.beginPath();
 			        context.arc(enemies[i].x, enemies[i].y, enemies[i].radius, 0, 2 * Math.PI, false);
 			        context.fillStyle = 'blue';
+					context.stroke();
 			        context.fill();
-		        }
+		        };
 				if(!isHitextship()){
 					context.beginPath();
 					context.arc(extship.x, extship.y, extship.radius, 0, 2 * Math.PI, false);
 					context.fillStyle = 'green';
+					context.stroke();
 					context.fill();
 				}else{
 					ship.radius+=1;
 					console.log("hit");	
 					extship=new extendship();
 					score+=1;
-				}
+				};
 				lastStamp = currentStamp;
 			}
 			window.requestAnimationFrame(draw);
@@ -185,35 +206,43 @@
 				if(distance(typeEnemy[i].x, typeEnemy[i].y,
 					ship.x, ship.y) <= ship.radius + typeEnemy[i].radius){
 					return true;
-				}
-			}
+				};
+			};
 			return false;
-		}
+		};
 		function isHitextship(){
 			if(distance(extship.x, extship.y,ship.x, ship.y) <= ship.radius + extship.radius){
 				return true;
-			}
+			};
 			return false;
-		}
+		};
 
 		function distance(x1, y1, x2, y2){
 			return Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
-		}
+		};
 
 		function onClick(x, y){
 			console.log(x + ":" + y);
-		}
+		};
 
 		function startGame(){
 			ship.x = canvas.width / 2;
 			ship.y = canvas.height / 2;
 			ship.radius=5;
-			gameRunning = true;
+			if(document.getElementById("c0").checked){
+				gamemode=0;
+				gameRunning = true;
+			}else if(document.getElementById("c1").checked){
+				gamemode=1;
+				gameRunning = true;
+			}else{
+				alert("choose your level")
+			};
 			time = 0;
 			score=0;
 			enemies = [];
 		    ExtraEnemies=[];
-		}
+		};
 		
         canvas.addEventListener('mousemove', function(evt) {
 	        var rect = canvas.getBoundingClientRect();
