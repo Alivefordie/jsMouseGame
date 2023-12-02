@@ -4,7 +4,7 @@
 </head>
 <body>
 	<button onclick="startGame()">New</button>
-	<div id="score">0</div>
+	<div id="time">0</div>
 	<canvas id="paper" width="400" height="400">
 	</canvas>
 </body>
@@ -43,7 +43,7 @@
 		var gameRunning = false;
 
 		var lastStamp = 0;
-		var score = 0;
+		var time = 0;
 		
 		setInterval(function(){
 			var deadEnemyIndices = [];
@@ -56,8 +56,8 @@
 				enemies.splice(deadEnemyIndices[i], 1);
 			}
 			enemies.push(new Enemy());
-			score += 1;
-			document.getElementById('score').innerHTML = '' + score;
+			time += 1;
+			document.getElementById('time').innerHTML = 'Time : ' + time;
 		}, 1000);
 		function draw(){
 			if(gameRunning){			
@@ -113,7 +113,7 @@
 			ship.x = canvas.width / 2;
 			ship.y = canvas.height / 2;
 			gameRunning = true;
-			score = 0;
+			time = 0;
 		}
 		
         canvas.addEventListener('mousemove', function(evt) {
