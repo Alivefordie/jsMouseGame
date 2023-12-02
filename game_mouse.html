@@ -4,11 +4,32 @@
 </head>
 <body>
 	<button onclick="startGame()">New</button>
-	<div id="time">0</div>
+	<div id="time">time:</div>
 	<canvas id="paper" width="400" height="400">
 	</canvas>
 </body>
-	<script type="text/javascript">		
+<script type="text/javascript">		
+		class Enemy {
+			constructor(){
+				this.x = Math.floor(Math.random()*canvas.width);
+				this.y = Math.floor(Math.random()*canvas.height);
+				this.lifetime = 3000;
+				this.radius = 5;      		
+			}
+			live(ms){
+				this.lifetime -= ms;
+			}
+			isAlive(){
+				return this.lifetime > 0; 
+			}	
+		};
+		class extendship extends Enemy{
+			constructor(){
+				super();
+				this.lifetime = 5000;
+				this.radius=7;
+			}
+		};
 		var canvas = document.getElementById("paper");
 		var targetX = canvas.width / 2;
 		var targetY = canvas.height / 2;
@@ -40,6 +61,7 @@
 			}
 		};		
 		var enemies = [];
+		var extship=new extendship();
 		var gameRunning = false;
 
 		var lastStamp = 0;
@@ -56,8 +78,13 @@
 				enemies.splice(deadEnemyIndices[i], 1);
 			}
 			enemies.push(new Enemy());
+			if(extship.isAlive()){
+				extship.live(1000);
+			} else{
+				extship=new extendship();
+			}
 			time += 1;
-			document.getElementById('time').innerHTML = 'Time : ' + time;
+			document.getElementById('time').innerHTML = 'time : ' + time;
 		}, 1000);
 		function draw(){
 			if(gameRunning){			
@@ -69,6 +96,10 @@
 				if(isHit()){
 		        	console.log('Game Over');
 		        	gameRunning = false;
+		        }
+				if(isHitextship()){
+		        	ship.radius+=1;
+					console.log("hit");	
 		        }
 
 				var context = canvas.getContext('2d');
@@ -84,7 +115,10 @@
 			        context.fillStyle = 'blue';
 			        context.fill();
 		        }
-		      
+				context.beginPath();
+				context.arc(extship.x, extship.y, extship.radius, 0, 2 * Math.PI, false);
+				context.fillStyle = 'green';
+				context.fill();
 				lastStamp = currentStamp;
 			}
 			window.requestAnimationFrame(draw);
@@ -100,6 +134,12 @@
 			}
 			return false;
 		}
+		function isHitextship(){
+			if(distance(extship.x, extship.y,ship.x, ship.y) <= ship.radius + extship.radius){
+				return true;
+			}
+			return false;
+		}
 
 		function distance(x1, y1, x2, y2){
 			return Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
@@ -112,6 +152,7 @@
 		function startGame(){
 			ship.x = canvas.width / 2;
 			ship.y = canvas.height / 2;
+			ship.radius=5;
 			gameRunning = true;
 			time = 0;
 		}
@@ -129,19 +170,6 @@
 	        onClick(x, y);
       	}, false);
 
-		class Enemy {
-			constructor(){
-				this.x = Math.floor(Math.random()*canvas.width);
-				this.y = Math.floor(Math.random()*canvas.height);
-				this.lifetime = 3000;
-				this.radius = 5;      		
-			}
-			live(ms){
-				this.lifetime -= ms;
-			}
-			isAlive(){
-				return this.lifetime > 0; 
-			}
-		}
+
 	</script>
 </html>
