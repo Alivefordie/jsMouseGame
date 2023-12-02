@@ -68,6 +68,7 @@
 		var time = 0;
 		var score=0;
 		var ccimg=new Image();
+		console.log(ccimg.width)
 		ccimg.src="https://ih1.redbubble.net/image.846505062.7003/flat,750x,075,f-pad,750x1000,f8f8f8.u3.jpg";
 		setInterval(function(){
 			var deadEnemyIndices = [];
@@ -103,7 +104,9 @@
 		        	gameRunning = false;
 		        }
 				context.clearRect(0, 0, canvas.width, canvas.height);
-				ccimg.onload=context.drawImage(ccimg,0,100,750,790,0,0,400,400);
+				if(ccimg.width!=0){
+					ccimg.onload=context.drawImage(ccimg,0,100,750,790,0,0,400,400);
+				}
 				context.beginPath();
 		        context.arc(ship.x, ship.y, ship.radius, 0, 2 * Math.PI, false);
 		        context.fillStyle = ship.color;
