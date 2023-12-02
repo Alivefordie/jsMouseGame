@@ -89,6 +89,7 @@
 		function draw(){
 			if(gameRunning){			
 				var currentStamp = new Date().getTime();
+				var context = canvas.getContext('2d');
 				if(lastStamp != 0){
 					var ms = currentStamp - lastStamp;
 					ship.moveTo(targetX, targetY, ms);
@@ -97,12 +98,6 @@
 		        	console.log('Game Over');
 		        	gameRunning = false;
 		        }
-				if(isHitextship()){
-		        	ship.radius+=1;
-					console.log("hit");	
-		        }
-
-				var context = canvas.getContext('2d');
 				context.clearRect(0, 0, canvas.width, canvas.height);	
 				context.beginPath();
 		        context.arc(ship.x, ship.y, ship.radius, 0, 2 * Math.PI, false);
@@ -115,10 +110,16 @@
 			        context.fillStyle = 'blue';
 			        context.fill();
 		        }
-				context.beginPath();
-				context.arc(extship.x, extship.y, extship.radius, 0, 2 * Math.PI, false);
-				context.fillStyle = 'green';
-				context.fill();
+				if(!isHitextship()){
+					context.beginPath();
+					context.arc(extship.x, extship.y, extship.radius, 0, 2 * Math.PI, false);
+					context.fillStyle = 'green';
+					context.fill();
+				}else{
+					ship.radius+=1;
+					console.log("hit");	
+					extship=new extendship();
+				}
 				lastStamp = currentStamp;
 			}
 			window.requestAnimationFrame(draw);
