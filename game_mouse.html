@@ -4,7 +4,7 @@
 </head>
 <body>
 	<button onclick="startGame()">New</button>
-	<div id="time">time:</div>
+	<div id="time">Play me</div>
 	<canvas id="paper" width="400" height="400">
 	</canvas>
 </body>
@@ -66,7 +66,9 @@
 
 		var lastStamp = 0;
 		var time = 0;
-		
+		var score=0;
+		var ccimg=new Image();
+		ccimg.src="https://ih1.redbubble.net/image.846505062.7003/flat,750x,075,f-pad,750x1000,f8f8f8.u3.jpg";
 		setInterval(function(){
 			var deadEnemyIndices = [];
 			for(var i = 0; i < enemies.length; i++){
@@ -83,8 +85,10 @@
 			} else{
 				extship=new extendship();
 			}
-			time += 1;
-			document.getElementById('time').innerHTML = 'time : ' + time;
+			if(gameRunning){
+				time += 1;
+				document.getElementById('time').innerHTML = 'time : ' + time +" your score : "+score;
+			}
 		}, 1000);
 		function draw(){
 			if(gameRunning){			
@@ -98,7 +102,8 @@
 		        	console.log('Game Over');
 		        	gameRunning = false;
 		        }
-				context.clearRect(0, 0, canvas.width, canvas.height);	
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				ccimg.onload=context.drawImage(ccimg,0,100,750,790,0,0,400,400);
 				context.beginPath();
 		        context.arc(ship.x, ship.y, ship.radius, 0, 2 * Math.PI, false);
 		        context.fillStyle = ship.color;
@@ -119,6 +124,7 @@
 					ship.radius+=1;
 					console.log("hit");	
 					extship=new extendship();
+					score+=1;
 				}
 				lastStamp = currentStamp;
 			}
@@ -156,6 +162,7 @@
 			ship.radius=5;
 			gameRunning = true;
 			time = 0;
+			score=0;
 		}
 		
         canvas.addEventListener('mousemove', function(evt) {
