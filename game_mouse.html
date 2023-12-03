@@ -102,13 +102,25 @@
 					this.y = 0;	
 			};
 		};
+		class armor extends Enemy{
+			constructor(){
+				super();
+				this.x=ship.x;
+				this.y=ship.y;
+				this.radius=ship.radius+4;
+				this.color='white';
+				this.lifetime=3000;
+			};
+		};
 		var canvas = document.getElementById("paper");
+		var context = canvas.getContext('2d');
 		var targetX = canvas.width / 2;
 		var targetY = canvas.height / 2;
 		var ship =  new ourship();	
 		var enemies = [];
 		var ExtraEnemies=[];
 		var extship=new extendship();
+		var armorship=[];
 		var gameRunning = false;
 		var gamemode=null
 
@@ -120,6 +132,7 @@
 		setInterval(function(){
 			var deadEnemyIndices = [];
 			var deadExtraEnemyIndices=[];
+			var brokenarmor=[];
 			function liveAndkill(type,dtype){
 				for(var i = 0; i < type.length; i++){
 					type[i].live(1000);
@@ -131,9 +144,13 @@
 				};
 			};
 			liveAndkill(enemies,deadEnemyIndices);
+			liveAndkill(armorship,brokenarmor);
 			if(gamemode==0){
 				liveAndkill(ExtraEnemies,deadExtraEnemyIndices);
 			};
+			canvas.addEventListener('mousedown', function(evt) {
+					armorship.push(new armor());
+			});
 			enemies.push(new Enemy());
 			ExtraEnemies.push(new ExtraEnemy());
 			if(extship.isAlive()){
@@ -149,7 +166,6 @@
 		function draw(){
 			if(gameRunning){			
 				var currentStamp = new Date().getTime();
-				var context = canvas.getContext('2d');
 				if(lastStamp != 0){
 					var ms = currentStamp - lastStamp;
 					ship.moveTo(targetX, targetY, ms);
@@ -169,6 +185,13 @@
 		        context.fillStyle = ship.color;
 				context.stroke();
 		        context.fill();
+				for(var i=0;i<armorship.length;i++){
+					context.beginPath();
+					context.arc(ship.x, ship.y, ship.radius+4, 0, 2 * Math.PI, false);
+					context.fillStyle = "white";
+					context.stroke();
+					context.fill();
+				};
 				for(var i = 0; i < ExtraEnemies.length; i++){
 					context.beginPath();
 			        context.arc(ExtraEnemies[i].x, ExtraEnemies[i].y, ExtraEnemies[i].radius, 0, 2 * Math.PI, false);
@@ -195,7 +218,7 @@
 					extship=new extendship();
 					score+=1;
 				};
-				if(isHit(enemies) ||isHit(ExtraEnemies)){
+				if((isHit(enemies) &&armorship.length==0) ||(isHit(ExtraEnemies)&&armorship.length==0)){
 					console.log('Game Over');
 					context.clearRect(0, 0, canvas.width, canvas.height);
 					if(ccimg.width!=0){
@@ -264,8 +287,9 @@
 			score=0;
 			enemies = [];
 		    ExtraEnemies=[];
+			armorship=[];
 		};
-		
+
         canvas.addEventListener('mousemove', function(evt) {
 	        var rect = canvas.getBoundingClientRect();
 	        targetX = evt.clientX - rect.left;
@@ -278,5 +302,6 @@
 	        var y = evt.clientY - rect.top;	 
 	        onClick(x, y);
       	}, false);
+		
 	</script>
 </html>
